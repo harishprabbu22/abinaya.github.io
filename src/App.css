@@ -3201,3 +3201,138 @@ section {
     }
 
 }
+
+/* =========================================
+   SURPRISE HEADING
+========================================= */
+
+.surprise-heading {
+    width: 100%;
+    max-width: 850px;
+    text-align: center;
+    margin: 0 auto 60px;
+}
+
+
+/* =========================================
+   SURPRISE TITLE
+========================================= */
+
+.surprise-title {
+    text-align: center;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(32px, 5vw, 64px);
+
+    line-height: 1.2;
+
+    font-weight: 400;
+
+    color: #f7ecd1;
+
+    margin: 0;
+}
+
+
+/* =========================================
+   TAMIL LOVE QUOTE
+========================================= */
+
+.surprise-tamil-quote {
+    margin: 25px 0 0;
+
+    font-family:
+        "Noto Serif Tamil",
+        "Latha",
+        Georgia,
+        serif;
+
+    font-size: clamp(17px, 2.2vw, 23px);
+
+    line-height: 1.9;
+
+    color: #e5d5ae;
+
+    font-weight: 400;
+
+    letter-spacing: 0.3px;
+
+    text-shadow:
+        0 0 20px rgba(216, 182, 106, 0.15);
+}
+
+
+/* =========================================
+   QUOTE HEART
+========================================= */
+
+.surprise-tamil-quote span {
+    display: block;
+
+    margin-top: 10px;
+
+    color: #d8b66a;
+
+    font-size: 16px;
+
+    animation:
+        surpriseHeartBeat
+        1.8s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes surpriseHeartBeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    15% {
+        transform: scale(1.25);
+    }
+
+    30% {
+        transform: scale(1);
+    }
+
+    45% {
+        transform: scale(1.15);
+    }
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .surprise-heading {
+        margin-bottom: 45px;
+    }
+
+    .surprise-tamil-quote {
+        font-size: 16px;
+        line-height: 1.8;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .surprise-title {
+        font-size: 30px;
+    }
+
+    .surprise-tamil-quote {
+        font-size: 15px;
+        line-height: 1.85;
+    }
+}

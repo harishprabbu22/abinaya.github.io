@@ -2,21 +2,23 @@ import React, { useRef, useState } from "react";
 import gsap from "gsap";
 import "./App.css";
 
+const BASE_URL = import.meta.env.BASE_URL;
+
 const memories = [
     {
-        image: "/images/abi-15.jpg",
+        image: `${BASE_URL}images/abi-15.jpg`,
         text: "My favourite smile."
     },
     {
-        image: "/images/abi-14.jpg",
+        image: `${BASE_URL}images/abi-14.jpg`,
         text: "My happiest memories."
     },
     {
-        image: "/images/abi-07.jpg",
+        image: `${BASE_URL}images/abi-07.jpg`,
         text: "My safest place."
     },
     {
-        image: "/images/abi-16.jpg",
+        image: `${BASE_URL}images/abi-16.jpg`,
         text: "My favourite person."
     }
 ];
@@ -35,9 +37,9 @@ export default function SurpriseSection() {
 
         const tl = gsap.timeline();
 
-        // ---------------------------------------
-        // INTRO FADES AWAY
-        // ---------------------------------------
+        // =========================================
+        // INTRO
+        // =========================================
 
         tl.to(".surprise-intro", {
             opacity: 0,
@@ -46,9 +48,9 @@ export default function SurpriseSection() {
             ease: "power2.inOut"
         })
 
-            // ---------------------------------------
+            // =========================================
             // BACKGROUND TRANSITION
-            // ---------------------------------------
+            // =========================================
 
             .to(
                 overlayRef.current,
@@ -59,9 +61,9 @@ export default function SurpriseSection() {
                 "-=0.2"
             )
 
-            // ---------------------------------------
+            // =========================================
             // GOLDEN LIGHT BURST
-            // ---------------------------------------
+            // =========================================
 
             .to(".surprise-light", {
                 scale: 25,
@@ -75,18 +77,18 @@ export default function SurpriseSection() {
                 duration: 1
             })
 
-            // ---------------------------------------
-            // REVEAL MAIN CONTENT
-            // ---------------------------------------
+            // =========================================
+            // REVEAL
+            // =========================================
 
             .to(revealRef.current, {
                 opacity: 1,
                 duration: 1
             })
 
-            // ---------------------------------------
-            // ENGLISH TITLE
-            // ---------------------------------------
+            // =========================================
+            // TITLE
+            // =========================================
 
             .fromTo(
                 ".surprise-title",
@@ -102,9 +104,9 @@ export default function SurpriseSection() {
                 }
             )
 
-            // ---------------------------------------
-            // TAMIL LOVE QUOTE
-            // ---------------------------------------
+            // =========================================
+            // TAMIL QUOTE
+            // =========================================
 
             .fromTo(
                 ".surprise-tamil-quote",
@@ -121,9 +123,9 @@ export default function SurpriseSection() {
                 "-=0.5"
             )
 
-            // ---------------------------------------
+            // =========================================
             // MEMORY CARDS
-            // ---------------------------------------
+            // =========================================
 
             .fromTo(
                 ".memory-card",
@@ -143,9 +145,9 @@ export default function SurpriseSection() {
                 "+=0.3"
             )
 
-            // ---------------------------------------
-            // MEMORY GALLERY
-            // ---------------------------------------
+            // =========================================
+            // GALLERY
+            // =========================================
 
             .to(
                 ".memory-gallery",
@@ -156,10 +158,6 @@ export default function SurpriseSection() {
                 "-=0.5"
             )
 
-            // ---------------------------------------
-            // MEMORIES CONTAINER
-            // ---------------------------------------
-
             .to(
                 ".memories-container",
                 {
@@ -169,9 +167,9 @@ export default function SurpriseSection() {
                 "-=0.3"
             )
 
-            // ---------------------------------------
+            // =========================================
             // FINAL MESSAGE
-            // ---------------------------------------
+            // =========================================
 
             .to(
                 ".final-message",
@@ -184,13 +182,12 @@ export default function SurpriseSection() {
                 "+=0.4"
             );
 
-        // Create floating particles
         createParticles();
     };
 
-    // ---------------------------------------
+    // =========================================
     // PARTICLES
-    // ---------------------------------------
+    // =========================================
 
     const createParticles = () => {
         const container = sectionRef.current;
@@ -198,7 +195,9 @@ export default function SurpriseSection() {
         if (!container) return;
 
         // Prevent duplicate particles
-        if (container.querySelector(".surprise-particle")) return;
+        if (container.querySelector(".surprise-particle")) {
+            return;
+        }
 
         for (let i = 0; i < 90; i++) {
             const particle = document.createElement("span");
@@ -210,7 +209,7 @@ export default function SurpriseSection() {
 
             container.appendChild(particle);
 
-            // Floating / glowing animation
+            // Glow / pulse
             gsap.fromTo(
                 particle,
                 {
@@ -228,6 +227,7 @@ export default function SurpriseSection() {
                 }
             );
 
+            // Floating movement
             gsap.to(particle, {
                 x: Math.random() * 120 - 60,
                 y: Math.random() * 120 - 60,
@@ -276,9 +276,7 @@ export default function SurpriseSection() {
                         onClick={openSurprise}
                     >
                         <span>✨</span>
-
                         Open Your Surprise
-
                         <span>✨</span>
                     </button>
 
@@ -286,7 +284,7 @@ export default function SurpriseSection() {
 
 
                 {/* =====================================
-                    GOLDEN LIGHT BURST
+                    LIGHT BURST
                 ====================================== */}
 
                 <div className="surprise-light"></div>
@@ -302,7 +300,7 @@ export default function SurpriseSection() {
                 >
 
                     {/* =================================
-                        TITLE + TAMIL LOVE QUOTE
+                        TITLE + TAMIL QUOTE
                     ================================== */}
 
                     <div className="surprise-heading">
@@ -331,7 +329,6 @@ export default function SurpriseSection() {
                         <div className="memory-gallery">
 
                             {memories.map((memory, index) => (
-
                                 <div
                                     className={`memory-card memory-${index + 1}`}
                                     key={memory.image}
@@ -351,7 +348,6 @@ export default function SurpriseSection() {
                                     </p>
 
                                 </div>
-
                             ))}
 
                         </div>
@@ -389,15 +385,14 @@ export default function SurpriseSection() {
                             This little world was made just for you.
                         </p>
 
-
                         {/* =================================
-                            PERSONAL AUDIO MESSAGE
+                            AUDIO MESSAGE
                         ================================== */}
 
                         <audio
                             className="love-audio"
                             controls
-                            src="/audio/my-message.mp3"
+                            src={`${BASE_URL}audio/message.mp3`}
                         />
 
                     </div>
@@ -405,7 +400,6 @@ export default function SurpriseSection() {
                 </div>
 
             </div>
-
         </section>
     );
 }

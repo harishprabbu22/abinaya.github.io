@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Lenis from "lenis";
 import "./App.css";
-import audioFile from "../public/audio/message.mp3";
+// import audioFile from "../public/audio/message.mp3";
 import SurpriseSection from "./SurpriseSection";
 
 const formatTime = (time) => {
@@ -325,7 +325,7 @@ function App() {
               <div className="memory-photo memory-photo-large">
 
                 <div className="photo-placeholder">
-                  <img src="/images/abi-01.jpg" alt="A beautiful memory with Abi" />
+                  <img src={`${import.meta.env.BASE_URL}images/abi-01.jpg`} alt="A beautiful memory with Abi" />
                 </div>
               </div>
 
@@ -365,7 +365,7 @@ function App() {
               <div className="memory-photo memory-photo-medium">
 
                 <div className="photo-placeholder">
-                  <img src="/images/abi-02.jpg" alt="A beautiful memory with Abi" />
+                  <img src={`${import.meta.env.BASE_URL}images/abi-02.jpg`} alt="A beautiful memory with Abi" />
                 </div>
 
               </div>
@@ -382,7 +382,7 @@ function App() {
               <div className="memory-photo memory-photo-medium">
 
                 <div className="photo-placeholder">
-                  <img src="/images/abi-03.jpg" alt="A beautiful memory with Abi" />
+                  <img src={`${import.meta.env.BASE_URL}images/abi-03.jpg`} alt="A beautiful memory with Abi" />
                 </div>
 
               </div>
@@ -423,7 +423,7 @@ function App() {
             <div className="memory-photo memory-photo-tall">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-04.jpg" alt="A beautiful memory with Abi" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-04.jpg`} alt="A beautiful memory with Abi" />
               </div>
 
             </div>
@@ -450,7 +450,7 @@ function App() {
             <div className="memory-photo memory-photo-wide">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-05.jpg" alt="A beautiful memory with Abi" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-05.jpg`} alt="A beautiful memory with Abi" />
               </div>
 
             </div>
@@ -474,7 +474,7 @@ function App() {
               <div className="memory-photo memory-photo-medium">
 
                 <div className="photo-placeholder">
-                  <img src="/images/abi-06.jpg" alt="A beautiful memory with Abi" />
+                  <img src={`${import.meta.env.BASE_URL}images/abi-06.jpg`} alt="A beautiful memory with Abi" />
                 </div>
 
               </div>
@@ -496,7 +496,7 @@ function App() {
               <div className="memory-photo memory-photo-medium">
 
                 <div className="photo-placeholder">
-                  <img src="/images/abi-07.jpg" alt="A beautiful memory with Abi" />
+                  <img src={`${import.meta.env.BASE_URL}images/abi-07.jpg`} alt="A beautiful memory with Abi" />
                 </div>
 
               </div>
@@ -525,7 +525,7 @@ function App() {
               <div className="memory-photo memory-photo-large">
 
                 <div className="photo-placeholder">
-                  <img src="/images/abi-08.jpg" alt="A beautiful memory with Abi" />
+                  <img src={`${import.meta.env.BASE_URL}images/abi-08.jpg`} alt="A beautiful memory with Abi" />
                 </div>
 
               </div>
@@ -560,7 +560,7 @@ function App() {
             <div className="memory-photo memory-photo-small">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-09.jpg" alt="A beautiful memory with Abi" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-09.jpg`} alt="A beautiful memory with Abi" />
               </div>
 
             </div>
@@ -593,7 +593,7 @@ function App() {
             <div className="memory-photo memory-photo-wide">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-10.jpg" alt="A beautiful memory with Abi" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-10.jpg`} alt="A beautiful memory with Abi" />
               </div>
 
             </div>
@@ -616,7 +616,7 @@ function App() {
             <div className="memory-photo memory-photo-final">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-11.jpg" alt="A beautiful memory with Abi" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-11.jpg`} alt="A beautiful memory with Abi" />
               </div>
             </div>
 
@@ -640,7 +640,7 @@ function App() {
             <div className="memory-photo memory-photo-last">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-12.jpg" alt="A beautiful memory with Abi" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-12.jpg`} alt="A beautiful memory with Abi" />
               </div>
 
             </div>
@@ -697,7 +697,7 @@ function App() {
             <div className="phd-image">
 
               <div className="photo-placeholder">
-                <img src="/images/abi-13.jpg" alt="PHD / CONVOCATION PHOTO" />
+                <img src={`${import.meta.env.BASE_URL}images/abi-13.jpg`} alt="PHD / CONVOCATION PHOTO" />
               </div>
 
             </div>
@@ -941,7 +941,7 @@ function App() {
 
             <audio
               ref={audioRef}
-              src={audioFile}
+              src={`${import.meta.env.BASE_URL}audio/message.mp3`}
               preload="metadata"
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
