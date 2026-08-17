@@ -27,6 +27,7 @@ export default function SurpriseSection() {
     const sectionRef = useRef(null);
     const overlayRef = useRef(null);
     const revealRef = useRef(null);
+    const magicRef = useRef(null);
 
     const [opened, setOpened] = useState(false);
 
@@ -38,7 +39,7 @@ export default function SurpriseSection() {
         const tl = gsap.timeline();
 
         // =========================================
-        // INTRO
+        // 1. INTRO FADES AWAY
         // =========================================
 
         tl.to(".surprise-intro", {
@@ -49,28 +50,169 @@ export default function SurpriseSection() {
         })
 
             // =========================================
-            // BACKGROUND TRANSITION
+            // 2. DARK MAGICAL WORLD
             // =========================================
 
             .to(
                 overlayRef.current,
                 {
-                    backgroundColor: "#07150f",
-                    duration: 1.2
+                    backgroundColor: "#040b08",
+                    duration: 1
                 },
                 "-=0.2"
             )
 
             // =========================================
-            // GOLDEN LIGHT BURST
+            // 3. SHOW MAGICAL WRITING
             // =========================================
 
-            .to(".surprise-light", {
-                scale: 25,
+            .to(
+                magicRef.current,
+                {
+                    opacity: 1,
+                    duration: 0.8
+                }
+            )
+
+            // =========================================
+            // 4. FIRST LINE
+            // =========================================
+
+            .to(".magic-line-1", {
                 opacity: 1,
-                duration: 2,
-                ease: "power3.inOut"
+                duration: 0.5
             })
+
+            .to(".magic-line-1 .magic-cursor", {
+                opacity: 1,
+                duration: 0.3
+            })
+
+            .to(".magic-line-1 .magic-cursor", {
+                opacity: 0,
+                duration: 0.3,
+                repeat: 2,
+                yoyo: true
+            })
+
+            // =========================================
+            // 5. SECOND LINE
+            // =========================================
+
+            .fromTo(
+                ".magic-line-2",
+                {
+                    opacity: 0,
+                    y: 15
+                },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.9,
+                    ease: "power3.out"
+                },
+                "+=0.4"
+            )
+
+            // =========================================
+            // 6. THIRD LINE
+            // =========================================
+
+            .fromTo(
+                ".magic-line-3",
+                {
+                    opacity: 0,
+                    y: 15
+                },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.9,
+                    ease: "power3.out"
+                },
+                "+=0.5"
+            )
+
+            // =========================================
+            // 7. FOURTH LINE
+            // =========================================
+
+            .fromTo(
+                ".magic-line-4",
+                {
+                    opacity: 0,
+                    y: 15
+                },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "power3.out"
+                },
+                "+=0.6"
+            )
+
+            // =========================================
+            // 8. ABI LINE — BIG EMOTIONAL MOMENT
+            // =========================================
+
+            .fromTo(
+                ".magic-final",
+                {
+                    opacity: 0,
+                    scale: 0.92,
+                    y: 20
+                },
+                {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    duration: 1.5,
+                    ease: "power3.out"
+                },
+                "+=0.8"
+            )
+
+            // Golden glow
+            .to(
+                ".magic-final",
+                {
+                    textShadow:
+                        "0 0 10px rgba(225,190,105,.4), 0 0 35px rgba(225,190,105,.25)",
+                    duration: 1.2
+                }
+            )
+
+            // =========================================
+            // 9. EVERYTHING DISSOLVES
+            // =========================================
+
+            .to(
+                ".magic-writing",
+                {
+                    opacity: 0,
+                    scale: 1.05,
+                    filter: "blur(8px)",
+                    duration: 1.2,
+                    ease: "power2.inOut"
+                },
+                "+=1"
+            )
+
+            // =========================================
+            // 10. GOLDEN LIGHT BURST
+            // =========================================
+
+            .to(
+                ".surprise-light",
+                {
+                    scale: 25,
+                    opacity: 1,
+                    duration: 2,
+                    ease: "power3.inOut"
+                },
+                "-=0.3"
+            )
 
             .to(".surprise-light", {
                 opacity: 0,
@@ -78,7 +220,7 @@ export default function SurpriseSection() {
             })
 
             // =========================================
-            // REVEAL
+            // 11. MAIN REVEAL
             // =========================================
 
             .to(revealRef.current, {
@@ -87,7 +229,7 @@ export default function SurpriseSection() {
             })
 
             // =========================================
-            // TITLE
+            // 12. TITLE
             // =========================================
 
             .fromTo(
@@ -105,7 +247,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // TAMIL QUOTE
+            // 13. TAMIL QUOTE
             // =========================================
 
             .fromTo(
@@ -124,7 +266,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // MEMORY CARDS
+            // 14. MEMORY CARDS
             // =========================================
 
             .fromTo(
@@ -146,7 +288,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // GALLERY
+            // 15. GALLERY
             // =========================================
 
             .to(
@@ -168,7 +310,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // FINAL MESSAGE
+            // 16. FINAL MESSAGE
             // =========================================
 
             .to(
@@ -183,6 +325,7 @@ export default function SurpriseSection() {
             );
 
         createParticles();
+        createMagicStars();
     };
 
     // =========================================
@@ -194,7 +337,6 @@ export default function SurpriseSection() {
 
         if (!container) return;
 
-        // Prevent duplicate particles
         if (container.querySelector(".surprise-particle")) {
             return;
         }
@@ -209,7 +351,6 @@ export default function SurpriseSection() {
 
             container.appendChild(particle);
 
-            // Glow / pulse
             gsap.fromTo(
                 particle,
                 {
@@ -227,11 +368,63 @@ export default function SurpriseSection() {
                 }
             );
 
-            // Floating movement
             gsap.to(particle, {
                 x: Math.random() * 120 - 60,
                 y: Math.random() * 120 - 60,
                 duration: Math.random() * 4 + 3,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        }
+    };
+
+    // =========================================
+    // MAGICAL STARS
+    // =========================================
+
+    const createMagicStars = () => {
+        const container = sectionRef.current;
+
+        if (!container) return;
+
+        if (container.querySelector(".magic-star")) {
+            return;
+        }
+
+        for (let i = 0; i < 25; i++) {
+            const star = document.createElement("span");
+
+            star.className = "magic-star";
+
+            star.innerHTML = "✦";
+
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+
+            container.appendChild(star);
+
+            gsap.fromTo(
+                star,
+                {
+                    opacity: 0,
+                    scale: 0
+                },
+                {
+                    opacity: Math.random() * 0.6 + 0.2,
+                    scale: Math.random() * 0.8 + 0.4,
+                    duration: Math.random() * 2 + 1,
+                    delay: Math.random() * 3,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                }
+            );
+
+            gsap.to(star, {
+                y: Math.random() * -80,
+                x: Math.random() * 60 - 30,
+                duration: Math.random() * 5 + 4,
                 repeat: -1,
                 yoyo: true,
                 ease: "sine.inOut"
@@ -284,6 +477,52 @@ export default function SurpriseSection() {
 
 
                 {/* =====================================
+                    MAGICAL TAMIL WRITING
+                ====================================== */}
+
+                <div
+                    ref={magicRef}
+                    className="magic-writing"
+                >
+
+                    <div className="magic-writing-inner">
+
+                        <p className="magic-line magic-line-1">
+                            சில கதைகள் எழுதப்படுவதில்லை...
+                            <span className="magic-cursor">
+                                |
+                            </span>
+                        </p>
+
+                        <p className="magic-line magic-line-2">
+                            அவை... வாழப்படுகின்றன.
+                        </p>
+
+                        <p className="magic-line magic-line-3">
+                            என் கதையில் நீ வந்த பிறகு...
+                            <br />
+                            சாதாரண நாட்களும் அழகான நினைவுகளாகிவிட்டன.
+                        </p>
+
+                        <p className="magic-line magic-line-4">
+                            தூரம் நம்மை பிரிக்கவில்லை...
+                            <br />
+                            இன்னும் நெருக்கமாக்கியது.
+                        </p>
+
+                        <p className="magic-final">
+                            அபி...
+                            <br />
+                            என் வாழ்க்கையின் அழகான அத்தியாயம் நீ.
+                            <span className="magic-heart">♥</span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {/* =====================================
                     LIGHT BURST
                 ====================================== */}
 
@@ -312,7 +551,8 @@ export default function SurpriseSection() {
                         </p>
 
                         <p className="surprise-tamil-quote">
-                            “உன்னை நேசிப்பதற்கு காரணம் தேடவில்லை…<br />
+                            “உன்னை நேசிப்பதற்கு காரணம் தேடவில்லை…
+                            <br />
                             நீ இருப்பதே எனக்கு போதுமான காரணம்.”
                             <span>♥</span>
                         </p>
@@ -384,10 +624,6 @@ export default function SurpriseSection() {
                         <p className="personal-note">
                             This little world was made just for you.
                         </p>
-
-                        {/* =================================
-                            AUDIO MESSAGE
-                        ================================== */}
 
                         <audio
                             className="love-audio"

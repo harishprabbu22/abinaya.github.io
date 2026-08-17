@@ -829,11 +829,11 @@ function App() {
 
               <div>
                 <p className="little-thing-title">
-                  We can argue about movies.
+                  Cares me like nobody else.
                 </p>
 
                 <p className="little-thing-description">
-                  And somehow neither of us is ever wrong.
+                  Can't explain how much that means to me.
                 </p>
               </div>
 
@@ -846,11 +846,28 @@ function App() {
 
               <div>
                 <p className="little-thing-title">
-                  You have your own little ways.
+                  unapologetically herself.
                 </p>
 
                 <p className="little-thing-description">
-                  The kind of things I notice without telling you.
+                  And I love that about her.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="little-thing">
+
+              <span>04</span>
+
+              <div>
+                <p className="little-thing-title">
+                  The voice of a girl who is confident, smart, and beautiful.
+                </p>
+
+                <p className="little-thing-description">
+                  And I could listen to it forever.
                 </p>
 
               </div>
@@ -860,12 +877,12 @@ function App() {
 
             <div className="little-thing">
 
-              <span>04</span>
+              <span>05</span>
 
               <div>
 
                 <p className="little-thing-title">
-                  Two months.
+                  Two months isn't a long time.
                 </p>
 
                 <p className="little-thing-description">
@@ -1193,7 +1210,7 @@ function App() {
             <div className="letter-content">
 
               <p className="letter-greeting">
-                My dear Abi,
+                My dear Baby Abi,
               </p>
 
 
@@ -1240,12 +1257,12 @@ function App() {
 
               <p>
                 Watching you complete your PhD in Mathematics
-                makes me incredibly proud.
+                makes me incredibly proud. And I don't just mean because you now have a title after your name. I mean because I know the journey you took to get there. The long nights, the hard work, the moments of doubt, and the persistence to keep going anyway.
               </p>
 
 
               <p className="letter-emphasis">
-                You did something extraordinary.
+                You did something extraordinary. You should be more proud of yourself, my brainy girl.
               </p>
 
 
@@ -1275,7 +1292,7 @@ function App() {
 
 
               <p>
-                I hope the year ahead brings you beautiful
+                I hope the year ahead brings you the best of all
                 things. New dreams. New adventures.
                 And many reasons to smile.
               </p>
@@ -1296,7 +1313,7 @@ function App() {
               <p className="letter-big">
                 I'm really happy
                 <br />
-                that I met you.
+                that I met you. You came into my life and made it better.
               </p>
 
 
@@ -1310,11 +1327,15 @@ function App() {
                 that's still waiting for us.
               </p>
 
+              <p>
+                Love you to the moon and back, my love, my baby, my Abi and my entire world.
+              </p>
+
 
               <p className="letter-signature">
                 Always yours,
                 <br />
-                <em>Pattu</em>
+                <em>Proud Pattu</em>
               </p>
 
             </div>
