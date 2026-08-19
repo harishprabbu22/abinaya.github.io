@@ -31,15 +31,87 @@ export default function SurpriseSection() {
 
     const [opened, setOpened] = useState(false);
 
-    const openSurprise = () => {
+    const wait = (ms) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+
+    /*
+     * Tamil needs special handling because some visible
+     * characters are made from multiple Unicode code points.
+     *
+     * Intl.Segmenter lets us type visible characters safely.
+     */
+    const getCharacters = (text) => {
+        if (
+            typeof Intl !== "undefined" &&
+            Intl.Segmenter
+        ) {
+            const segmenter = new Intl.Segmenter("ta", {
+                granularity: "grapheme"
+            });
+
+            return [
+                ...segmenter.segment(text)
+            ].map((item) => item.segment);
+        }
+
+        return [...text];
+    };
+
+    /*
+     * Real live typing animation.
+     */
+    const typeLine = async (
+        element,
+        text,
+        speed = 65
+    ) => {
+        if (!element) return;
+
+        const cursor = element.querySelector(
+            ".typing-cursor"
+        );
+
+        const textElement = element.querySelector(
+            ".typing-text"
+        );
+
+        if (!textElement) return;
+
+        textElement.textContent = "";
+
+        const characters = getCharacters(text);
+
+        for (const character of characters) {
+            textElement.textContent += character;
+
+            /*
+             * Slightly random typing speed makes it feel
+             * more human rather than robotic.
+             */
+            const randomSpeed =
+                speed * (0.7 + Math.random() * 0.6);
+
+            await wait(randomSpeed);
+        }
+
+        /*
+         * Tiny pause after completing a sentence.
+         */
+        await wait(900);
+    };
+
+    const openSurprise = async () => {
         if (opened) return;
 
         setOpened(true);
 
+        createParticles();
+        createMagicStars();
+
         const tl = gsap.timeline();
 
         // =========================================
-        // 1. INTRO FADES AWAY
+        // INTRO DISAPPEARS
         // =========================================
 
         tl.to(".surprise-intro", {
@@ -50,21 +122,17 @@ export default function SurpriseSection() {
         })
 
             // =========================================
-            // 2. DARK MAGICAL WORLD
+            // DARK FANTASY WORLD
             // =========================================
 
             .to(
                 overlayRef.current,
                 {
-                    backgroundColor: "#040b08",
+                    backgroundColor: "#030907",
                     duration: 1
                 },
                 "-=0.2"
             )
-
-            // =========================================
-            // 3. SHOW MAGICAL WRITING
-            // =========================================
 
             .to(
                 magicRef.current,
@@ -72,147 +140,140 @@ export default function SurpriseSection() {
                     opacity: 1,
                     duration: 0.8
                 }
-            )
+            );
 
-            // =========================================
-            // 4. FIRST LINE
-            // =========================================
+        await tl;
 
-            .to(".magic-line-1", {
+        // =========================================
+        // LIVE TYPING
+        // =========================================
+
+        const lines = [
+            {
+                selector: ".typing-line-1",
+                text: "என் இருள் சூழ்ந்த வாழ்வில் வெளிச்சம் தந்த வெண்ணிலவே...",
+                speed: 65
+            },
+            {
+                selector: ".typing-line-2",
+                text: "வரமாய் வந்து என் கைகளில் அடைக்கலம் அடைந்த தேவதையே!",
+                speed: 60
+            },
+            {
+                selector: ".typing-line-3",
+                text: "இனி காலத்திற்கும் உன் கைகள் கோர்த்து...",
+                speed: 65
+            },
+            {
+                selector: ".typing-line-4",
+                text: "ஆயுள் முழுவதும் தொடரக் கூட வருவாயா என் வழித்துணையே?",
+                speed: 55
+            },
+            {
+                selector: ".typing-line-5",
+                text: "இந்தத் தூரம் நம்மைப் பிரிக்கவில்லை...",
+                speed: 75
+            },
+            {
+                selector: ".typing-line-6",
+                text: "இன்னும் நெருக்கமாகத்தான் மாற்றியுள்ளது.",
+                speed: 80
+            },
+            {
+                selector: ".typing-final",
+                text: "அபி...",
+                speed: 110
+            }
+        ];
+
+        for (const line of lines) {
+            const element =
+                magicRef.current.querySelector(
+                    line.selector
+                );
+
+            gsap.to(element, {
                 opacity: 1,
-                duration: 0.5
-            })
+                duration: 0.4
+            });
 
-            .to(".magic-line-1 .magic-cursor", {
-                opacity: 1,
-                duration: 0.3
-            })
+            await typeLine(
+                element,
+                line.text,
+                line.speed
+            );
+        }
 
-            .to(".magic-line-1 .magic-cursor", {
+        // =========================================
+        // FINAL LINE
+        // =========================================
+
+        const finalLoveLine =
+            magicRef.current.querySelector(
+                ".typing-final-love"
+            );
+
+        gsap.to(finalLoveLine, {
+            opacity: 1,
+            duration: 0.5
+        });
+
+        await typeLine(
+            finalLoveLine,
+            "என் வாழ்க்கையின் அழகான அத்தியாயம் நீ.",
+            65
+        );
+
+        // =========================================
+        // HEART
+        // =========================================
+
+        await wait(500);
+
+        gsap.fromTo(
+            ".typing-heart",
+            {
                 opacity: 0,
-                duration: 0.3,
-                repeat: 2,
-                yoyo: true
+                scale: 0
+            },
+            {
+                opacity: 1,
+                scale: 1,
+                duration: 0.9,
+                ease: "back.out(2)"
+            }
+        );
+
+        await wait(1800);
+
+        // =========================================
+        // DISSOLVE MAGIC WRITING
+        // =========================================
+
+        await gsap.to(
+            ".magic-writing-inner",
+            {
+                opacity: 0,
+                scale: 1.06,
+                filter: "blur(8px)",
+                duration: 1.2,
+                ease: "power2.inOut"
+            }
+        );
+
+        // =========================================
+        // GOLDEN LIGHT BURST
+        // =========================================
+
+        const burst = gsap.timeline();
+
+        burst
+            .to(".surprise-light", {
+                scale: 25,
+                opacity: 1,
+                duration: 2,
+                ease: "power3.inOut"
             })
-
-            // =========================================
-            // 5. SECOND LINE
-            // =========================================
-
-            .fromTo(
-                ".magic-line-2",
-                {
-                    opacity: 0,
-                    y: 15
-                },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.9,
-                    ease: "power3.out"
-                },
-                "+=0.4"
-            )
-
-            // =========================================
-            // 6. THIRD LINE
-            // =========================================
-
-            .fromTo(
-                ".magic-line-3",
-                {
-                    opacity: 0,
-                    y: 15
-                },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.9,
-                    ease: "power3.out"
-                },
-                "+=0.5"
-            )
-
-            // =========================================
-            // 7. FOURTH LINE
-            // =========================================
-
-            .fromTo(
-                ".magic-line-4",
-                {
-                    opacity: 0,
-                    y: 15
-                },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 1,
-                    ease: "power3.out"
-                },
-                "+=0.6"
-            )
-
-            // =========================================
-            // 8. ABI LINE — BIG EMOTIONAL MOMENT
-            // =========================================
-
-            .fromTo(
-                ".magic-final",
-                {
-                    opacity: 0,
-                    scale: 0.92,
-                    y: 20
-                },
-                {
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                    duration: 1.5,
-                    ease: "power3.out"
-                },
-                "+=0.8"
-            )
-
-            // Golden glow
-            .to(
-                ".magic-final",
-                {
-                    textShadow:
-                        "0 0 10px rgba(225,190,105,.4), 0 0 35px rgba(225,190,105,.25)",
-                    duration: 1.2
-                }
-            )
-
-            // =========================================
-            // 9. EVERYTHING DISSOLVES
-            // =========================================
-
-            .to(
-                ".magic-writing",
-                {
-                    opacity: 0,
-                    scale: 1.05,
-                    filter: "blur(8px)",
-                    duration: 1.2,
-                    ease: "power2.inOut"
-                },
-                "+=1"
-            )
-
-            // =========================================
-            // 10. GOLDEN LIGHT BURST
-            // =========================================
-
-            .to(
-                ".surprise-light",
-                {
-                    scale: 25,
-                    opacity: 1,
-                    duration: 2,
-                    ease: "power3.inOut"
-                },
-                "-=0.3"
-            )
 
             .to(".surprise-light", {
                 opacity: 0,
@@ -220,7 +281,7 @@ export default function SurpriseSection() {
             })
 
             // =========================================
-            // 11. MAIN REVEAL
+            // MAIN REVEAL
             // =========================================
 
             .to(revealRef.current, {
@@ -229,7 +290,7 @@ export default function SurpriseSection() {
             })
 
             // =========================================
-            // 12. TITLE
+            // TITLE
             // =========================================
 
             .fromTo(
@@ -247,7 +308,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // 13. TAMIL QUOTE
+            // TAMIL QUOTE
             // =========================================
 
             .fromTo(
@@ -266,7 +327,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // 14. MEMORY CARDS
+            // MEMORY CARDS
             // =========================================
 
             .fromTo(
@@ -287,10 +348,6 @@ export default function SurpriseSection() {
                 "+=0.3"
             )
 
-            // =========================================
-            // 15. GALLERY
-            // =========================================
-
             .to(
                 ".memory-gallery",
                 {
@@ -310,7 +367,7 @@ export default function SurpriseSection() {
             )
 
             // =========================================
-            // 16. FINAL MESSAGE
+            // FINAL MESSAGE
             // =========================================
 
             .to(
@@ -323,9 +380,6 @@ export default function SurpriseSection() {
                 },
                 "+=0.4"
             );
-
-        createParticles();
-        createMagicStars();
     };
 
     // =========================================
@@ -337,17 +391,26 @@ export default function SurpriseSection() {
 
         if (!container) return;
 
-        if (container.querySelector(".surprise-particle")) {
+        if (
+            container.querySelector(
+                ".surprise-particle"
+            )
+        ) {
             return;
         }
 
         for (let i = 0; i < 90; i++) {
-            const particle = document.createElement("span");
+            const particle =
+                document.createElement("span");
 
-            particle.className = "surprise-particle";
+            particle.className =
+                "surprise-particle";
 
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.left =
+                `${Math.random() * 100}%`;
+
+            particle.style.top =
+                `${Math.random() * 100}%`;
 
             container.appendChild(particle);
 
@@ -358,10 +421,14 @@ export default function SurpriseSection() {
                     scale: 0
                 },
                 {
-                    opacity: Math.random() * 0.8 + 0.2,
-                    scale: Math.random() * 1.5 + 0.5,
-                    duration: Math.random() * 2 + 1,
-                    delay: Math.random() * 2,
+                    opacity:
+                        Math.random() * 0.8 + 0.2,
+                    scale:
+                        Math.random() * 1.5 + 0.5,
+                    duration:
+                        Math.random() * 2 + 1,
+                    delay:
+                        Math.random() * 2,
                     repeat: -1,
                     yoyo: true,
                     ease: "sine.inOut"
@@ -369,9 +436,12 @@ export default function SurpriseSection() {
             );
 
             gsap.to(particle, {
-                x: Math.random() * 120 - 60,
-                y: Math.random() * 120 - 60,
-                duration: Math.random() * 4 + 3,
+                x:
+                    Math.random() * 120 - 60,
+                y:
+                    Math.random() * 120 - 60,
+                duration:
+                    Math.random() * 4 + 3,
                 repeat: -1,
                 yoyo: true,
                 ease: "sine.inOut"
@@ -380,7 +450,7 @@ export default function SurpriseSection() {
     };
 
     // =========================================
-    // MAGICAL STARS
+    // MAGIC STARS
     // =========================================
 
     const createMagicStars = () => {
@@ -388,19 +458,25 @@ export default function SurpriseSection() {
 
         if (!container) return;
 
-        if (container.querySelector(".magic-star")) {
+        if (
+            container.querySelector(".magic-star")
+        ) {
             return;
         }
 
-        for (let i = 0; i < 25; i++) {
-            const star = document.createElement("span");
+        for (let i = 0; i < 30; i++) {
+            const star =
+                document.createElement("span");
 
             star.className = "magic-star";
 
             star.innerHTML = "✦";
 
-            star.style.left = `${Math.random() * 100}%`;
-            star.style.top = `${Math.random() * 100}%`;
+            star.style.left =
+                `${Math.random() * 100}%`;
+
+            star.style.top =
+                `${Math.random() * 100}%`;
 
             container.appendChild(star);
 
@@ -411,10 +487,14 @@ export default function SurpriseSection() {
                     scale: 0
                 },
                 {
-                    opacity: Math.random() * 0.6 + 0.2,
-                    scale: Math.random() * 0.8 + 0.4,
-                    duration: Math.random() * 2 + 1,
-                    delay: Math.random() * 3,
+                    opacity:
+                        Math.random() * 0.7 + 0.2,
+                    scale:
+                        Math.random() * 0.8 + 0.4,
+                    duration:
+                        Math.random() * 2 + 1,
+                    delay:
+                        Math.random() * 3,
                     repeat: -1,
                     yoyo: true,
                     ease: "sine.inOut"
@@ -422,9 +502,12 @@ export default function SurpriseSection() {
             );
 
             gsap.to(star, {
-                y: Math.random() * -80,
-                x: Math.random() * 60 - 30,
-                duration: Math.random() * 5 + 4,
+                y:
+                    Math.random() * -80,
+                x:
+                    Math.random() * 60 - 30,
+                duration:
+                    Math.random() * 5 + 4,
                 repeat: -1,
                 yoyo: true,
                 ease: "sine.inOut"
@@ -435,7 +518,8 @@ export default function SurpriseSection() {
     return (
         <section
             ref={sectionRef}
-            className={`surprise-section ${opened ? "opened" : ""}`}
+            className={`surprise-section ${opened ? "opened" : ""
+                }`}
         >
             <div
                 ref={overlayRef}
@@ -461,7 +545,8 @@ export default function SurpriseSection() {
                     </h2>
 
                     <p className="surprise-subtitle">
-                        I have one more little surprise for you.
+                        I have one more little
+                        surprise for you.
                     </p>
 
                     <button
@@ -477,7 +562,7 @@ export default function SurpriseSection() {
 
 
                 {/* =====================================
-                    MAGICAL TAMIL WRITING
+                    LIVE TYPING FANTASY
                 ====================================== */}
 
                 <div
@@ -487,35 +572,65 @@ export default function SurpriseSection() {
 
                     <div className="magic-writing-inner">
 
-                        <p className="magic-line magic-line-1">
-                            சில கதைகள் எழுதப்படுவதில்லை...
-                            <span className="magic-cursor">
+                        <p className="typing-line typing-line-1">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
                                 |
                             </span>
                         </p>
 
-                        <p className="magic-line magic-line-2">
-                            அவை... வாழப்படுகின்றன.
+                        <p className="typing-line typing-line-2">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
                         </p>
 
-                        <p className="magic-line magic-line-3">
-                            என் கதையில் நீ வந்த பிறகு...
-                            <br />
-                            சாதாரண நாட்களும் அழகான நினைவுகளாகிவிட்டன.
+                        <p className="typing-line typing-line-3">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
                         </p>
 
-                        <p className="magic-line magic-line-4">
-                            தூரம் நம்மை பிரிக்கவில்லை...
-                            <br />
-                            இன்னும் நெருக்கமாக்கியது.
+                        <p className="typing-line typing-line-4">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
                         </p>
 
-                        <p className="magic-final">
-                            அபி...
-                            <br />
-                            என் வாழ்க்கையின் அழகான அத்தியாயம் நீ.
-                            <span className="magic-heart">♥</span>
+                        <p className="typing-line typing-line-5">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
                         </p>
+
+                        <p className="typing-line typing-line-6">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
+                        </p>
+
+                        <p className="typing-final">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
+                        </p>
+
+                        <p className="typing-final-love">
+                            <span className="typing-text"></span>
+                            <span className="typing-cursor">
+                                |
+                            </span>
+                        </p>
+
+                        <div className="typing-heart">
+                            ♥
+                        </div>
 
                     </div>
 
@@ -523,7 +638,7 @@ export default function SurpriseSection() {
 
 
                 {/* =====================================
-                    LIGHT BURST
+                    GOLDEN BURST
                 ====================================== */}
 
                 <div className="surprise-light"></div>
@@ -538,10 +653,6 @@ export default function SurpriseSection() {
                     className="surprise-reveal"
                 >
 
-                    {/* =================================
-                        TITLE + TAMIL QUOTE
-                    ================================== */}
-
                     <div className="surprise-heading">
 
                         <p className="surprise-title">
@@ -551,66 +662,73 @@ export default function SurpriseSection() {
                         </p>
 
                         <p className="surprise-tamil-quote">
-                            “உன்னை நேசிப்பதற்கு காரணம் தேடவில்லை…
+                            “உன்னை நேசிப்பதற்கு காரணம்
+                            தேடவில்லை…
                             <br />
-                            நீ இருப்பதே எனக்கு போதுமான காரணம்.”
+                            நீ இருப்பதே எனக்கு
+                            போதுமான காரணம்.”
                             <span>♥</span>
                         </p>
 
                     </div>
 
 
-                    {/* =================================
-                        MEMORY GALLERY
-                    ================================== */}
-
                     <div className="memories-container">
 
                         <div className="memory-gallery">
 
-                            {memories.map((memory, index) => (
-                                <div
-                                    className={`memory-card memory-${index + 1}`}
-                                    key={memory.image}
-                                >
+                            {memories.map(
+                                (memory, index) => (
+                                    <div
+                                        className={`memory-card memory-${index + 1
+                                            }`}
+                                        key={
+                                            memory.image
+                                        }
+                                    >
 
-                                    <div className="memory-image-wrapper">
+                                        <div className="memory-image-wrapper">
 
-                                        <img
-                                            src={memory.image}
-                                            alt={memory.text}
-                                        />
+                                            <img
+                                                src={
+                                                    memory.image
+                                                }
+                                                alt={
+                                                    memory.text
+                                                }
+                                            />
+
+                                        </div>
+
+                                        <p>
+                                            {
+                                                memory.text
+                                            }
+                                        </p>
 
                                     </div>
-
-                                    <p>
-                                        {memory.text}
-                                    </p>
-
-                                </div>
-                            ))}
+                                )
+                            )}
 
                         </div>
 
                     </div>
 
 
-                    {/* =================================
-                        FINAL EMOTIONAL MESSAGE
-                    ================================== */}
-
                     <div className="final-message">
 
                         <div className="final-line"></div>
 
                         <p className="final-intro">
-                            Out of all the beautiful things
+                            Out of all the beautiful
+                            things
                             <br />
                             life could have given me...
                         </p>
 
                         <h3>
-                            It gave me <span>you.</span>
+                            It gave me{" "}
+                            <span>you.</span>
                         </h3>
 
                         <div className="heart">
@@ -622,7 +740,8 @@ export default function SurpriseSection() {
                         </p>
 
                         <p className="personal-note">
-                            This little world was made just for you.
+                            This little world was made
+                            just for you.
                         </p>
 
                         <audio
