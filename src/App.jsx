@@ -21,8 +21,12 @@ const formatTime = (time) => {
 
 function App() {
   const [opened, setOpened] = useState(false);
+  const [clickBursts, setClickBursts] = useState([]);
 
   const openingRef = useRef(null);
+  const cursorRef = useRef(null);
+  const cursorGlowRef = useRef(null);
+  const scrollProgressRef = useRef(null);
   const introRef = useRef(null);
 
   const dateRef = useRef(null);
@@ -32,59 +36,159 @@ function App() {
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    // Smooth scrolling
+    // Aggressive buttery smooth scrolling.
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.95,
       smoothWheel: true,
+      wheelMultiplier: 1.15,
+      touchMultiplier: 1.4,
+      syncTouch: true,
     });
 
-    function raf(time) {
+    let rafId;
+    const raf = (time) => {
       lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+      rafId = requestAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(raf);
 
-    requestAnimationFrame(raf);
+    const updateProgress = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = max > 0 ? window.scrollY / max : 0;
+      if (scrollProgressRef.current) {
+        scrollProgressRef.current.style.transform = `scaleX(${progress})`;
+      }
+    };
 
-    // Opening animation
-    const timeline = gsap.timeline({
-      defaults: {
-        ease: "power3.out",
+    const moveCursor = (event) => {
+      if (cursorRef.current) {
+        gsap.to(cursorRef.current, {
+          x: event.clientX,
+          y: event.clientY,
+          duration: 0.18,
+          ease: "power3.out",
+          overwrite: "auto",
+        });
+      }
+      if (cursorGlowRef.current) {
+        gsap.to(cursorGlowRef.current, {
+          x: event.clientX,
+          y: event.clientY,
+          duration: 0.65,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      }
+    };
+
+    const handleClickBurst = (event) => {
+      // Avoid creating a burst from keyboard-generated synthetic clicks.
+      if (event.detail === 0) return;
+
+      const id = `${Date.now()}-${Math.random()}`;
+      const count = 18 + Math.floor(Math.random() * 14);
+      const particles = Array.from({ length: count }, (_, index) => {
+        const angle = (Math.PI * 2 * index) / count + Math.random() * 0.45;
+        const distance = 45 + Math.random() * 150;
+        return {
+          id: `${id}-${index}`,
+          angle: `${angle}rad`,
+          distance: `${distance}px`,
+          size: `${7 + Math.random() * 18}px`,
+          delay: `${Math.random() * 0.16}s`,
+          spin: `${(Math.random() - 0.5) * 720}deg`,
+        };
+      });
+
+      setClickBursts((bursts) => [
+        ...bursts,
+        { id, x: event.clientX, y: event.clientY, particles },
+      ]);
+
+      window.setTimeout(() => {
+        setClickBursts((bursts) => bursts.filter((burst) => burst.id !== id));
+      }, 1900);
+    };
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+            revealObserver.unobserve(entry.target);
+          }
+        });
       },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    const revealTargets = document.querySelectorAll(
+      ".intro-inner, .memory-intro, .memory-feature, .memory-pair, .memory-text-break, .memory-offset, .memory-wide, .memory-small-feature, .memory-final-photo, .memory-last, .phd-intro, .phd-achievement, .phd-appreciation, .phd-equation, .little-things-intro, .little-thing, .little-things-ending, .radio-header, .radio-player, .radio-message, .letter-intro, .love-letter, .letter-closing, .outro-inner"
+    );
+    revealTargets.forEach((target, index) => {
+      target.classList.add("reveal-on-scroll");
+      target.style.setProperty("--reveal-delay", `${Math.min((index % 4) * 0.07, 0.21)}s`);
+      revealObserver.observe(target);
+    });
+
+    const magneticTargets = document.querySelectorAll(
+      ".open-button, .radio-play-button, .radio-skip-button"
+    );
+
+    const magneticHandlers = [];
+    magneticTargets.forEach((element) => {
+      const move = (event) => {
+        const rect = element.getBoundingClientRect();
+        const x = event.clientX - rect.left - rect.width / 2;
+        const y = event.clientY - rect.top - rect.height / 2;
+        gsap.to(element, {
+          x: x * 0.18,
+          y: y * 0.18,
+          duration: 0.35,
+          ease: "power3.out",
+        });
+      };
+      const leave = () =>
+        gsap.to(element, {
+          x: 0,
+          y: 0,
+          duration: 0.7,
+          ease: "elastic.out(1, 0.45)",
+        });
+      element.addEventListener("mousemove", move);
+      element.addEventListener("mouseleave", leave);
+      magneticHandlers.push([element, move, leave]);
+    });
+
+    window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("click", handleClickBurst);
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+
+    // Opening animation.
+    const timeline = gsap.timeline({
+      defaults: { ease: "power3.out" },
     });
 
     timeline
-      .fromTo(
-        dateRef.current,
-        { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, duration: 1.2 }
-      )
-      .fromTo(
-        eyebrowRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 1 },
-        "-=0.6"
-      )
-      .fromTo(
-        titleRef.current,
-        { opacity: 0, y: 35 },
-        { opacity: 1, y: 0, duration: 1.3 },
-        "-=0.5"
-      )
-      .fromTo(
-        messageRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 1 },
-        "-=0.6"
-      )
-      .fromTo(
-        buttonRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 1 },
-        "-=0.5"
-      );
+      .fromTo(dateRef.current, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 1.2 })
+      .fromTo(eyebrowRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1 }, "-=0.6")
+      .fromTo(titleRef.current, { opacity: 0, y: 35, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 1.3 }, "-=0.5")
+      .fromTo(messageRef.current, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1 }, "-=0.6")
+      .fromTo(buttonRef.current, { opacity: 0, y: 20, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 1 }, "-=0.5");
 
     return () => {
+      cancelAnimationFrame(rafId);
       lenis.destroy();
+      revealObserver.disconnect();
+      timeline.kill();
+      window.removeEventListener("mousemove", moveCursor);
+      window.removeEventListener("click", handleClickBurst);
+      window.removeEventListener("scroll", updateProgress);
+      magneticHandlers.forEach(([element, move, leave]) => {
+        element.removeEventListener("mousemove", move);
+        element.removeEventListener("mouseleave", leave);
+      });
     };
   }, []);
 
@@ -177,7 +281,41 @@ function App() {
   };
 
   return (
-    <main>
+    <main className="experience-shell">
+      <div className="scroll-progress" aria-hidden="true">
+        <span ref={scrollProgressRef}></span>
+      </div>
+      <div ref={cursorGlowRef} className="cursor-glow" aria-hidden="true"></div>
+      <div ref={cursorRef} className="cursor-dot" aria-hidden="true"></div>
+
+      <div className="click-burst-layer" aria-hidden="true">
+        {clickBursts.map((burst) => (
+          <div
+            className="click-burst"
+            key={burst.id}
+            style={{ left: burst.x, top: burst.y }}
+          >
+            <span className="click-abi">அபி</span>
+            <span className="click-ripple"></span>
+            {burst.particles.map((particle) => (
+              <span
+                className="peacock-particle"
+                key={particle.id}
+                style={{
+                  "--angle": particle.angle,
+                  "--distance": particle.distance,
+                  "--size": particle.size,
+                  "--delay": particle.delay,
+                  "--spin": particle.spin,
+                }}
+              >
+                <i></i>
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+
       {/* =========================
           OPENING
       ========================== */}
@@ -233,9 +371,14 @@ function App() {
         </div>
 
         {opened && (
-          <div className="opening-transition">
-            <p>For you, baby.</p>
-          </div>
+          <>
+            <div className="opening-transition">
+              <p>For you, my love.</p><br />
+            </div>
+            <div className="opening-transition opening-transition-second">
+              <p>இனிய பிறந்தநாள் வாழ்த்துகள், அபி kutty.</p>
+            </div>
+          </>
         )}
       </section>
 
@@ -342,11 +485,11 @@ function App() {
               </p>
 
               <h3>
-                The day I first met you.
+                The perfect eye contact.
               </h3>
 
               <p>
-                Our first little chapter.
+                Our beautiful little chapter.
               </p>
 
             </div>
@@ -1422,6 +1565,9 @@ function App() {
             Here's to the beginning
             <br />
             of everything.
+            <br />
+            <br />
+            <em>Love you di chellam!</em>
           </p>
 
 
